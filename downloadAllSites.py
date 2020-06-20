@@ -13,6 +13,7 @@ from requests.exceptions import Timeout
 import re
 import json
 import string
+from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
@@ -72,6 +73,8 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
     for (r,url) in repos:
         print(r + " " + url)
         responseData = {}
+        responseData['url'] = url
+        responseData['ID'] = r
 # Set up session so that request looks as if it is from a standard browser
         http = requests.Session()
         http.headers.update({"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0"
@@ -138,6 +141,42 @@ def clean_string(s):
     text = "".text.lower()
     text = " ".join([word for word in text.split() if word not in stopwords ])
     return(text)
+
+"""
+input oldDir - directory with repo json files
+      newDir - directoty where repos that timed out will be rerun and stored
+      
+"""
+def reRunTimeOutRepos(oldDir,newDir):
+    # Check if newDir exists otherwise create it
+    p = Path(newDir)
+    if not p.exists():
+        os.mkdir(newDir)
+        
+    # Find all json files in oldDir
+    allRepos = listJsonRepoFiles(oldDir)
+    timedOutReposList = []
+    # Loop through the repos and find the ones that had a time out
+    for repoFn in allRepos:
+        repoPlusPath = os.path.join(oldDir,repoFn)
+        repo = readReposList(repoPlusPath)
+        if 'Timeout' in repo:
+            (r,url) = (repo['ID'],repo['url'])
+            timedOutReposList.append((r,url))
+    
+    # Now rerun download attempt with timed out repos
+    getWebPage(timedOutReposList,newDir)
+    
+    
+    
+    getWebPage(timedOutReposList,newDir) 
+        
+            
+            
+        
+    
+    
+    
 
 
 

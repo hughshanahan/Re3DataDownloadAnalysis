@@ -7,6 +7,8 @@ Created on Wed Jun  3 16:18:51 2020
 """
 
 import os
+import requests
+import json
 
 """
 input fn 
@@ -26,7 +28,6 @@ def collateRepoURLs(repoFn):
     with open(repoFn) as f:
         for line in f:
             r = (line.split(r'<id>')[1]).split(r'</id>')[0]
-            repos.append(r)
             command = 'curl -o r.xml https://www.re3data.org/api/v1/repository/'+r
             os.system(command)
             with open('r.xml', 'r') as fXml:
@@ -38,6 +39,21 @@ def collateRepoURLs(repoFn):
             repos.append((r,url))
     return(repos)
     
+"""
+input filename
+output repos list of tuples of form (r3dID, url)
+"""
+def readReposList(filename):
+    with open(filename) as f:
+        return(json.load(filename))
+    
+"""
+input filename, repos list of tuples of form (r3dID, url)
+saves repos as a json file
+"""    
+def writeReposList(repos,filename):
+    with open(filename, 'w') as json_file:
+        json.dump(repos,json_file)
 
 """
 input repos - list of repos (tuples (r3dID, url))

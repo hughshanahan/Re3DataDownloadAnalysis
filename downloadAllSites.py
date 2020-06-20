@@ -10,7 +10,7 @@ import os
 import requests
 from requests.exceptions import HTTPError
 from requests.exceptions import Timeout
-
+import re
 import json
 
 """
@@ -92,6 +92,20 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
 
         with open(jsonFn, 'w') as json_file:
             json.dump(responseData,json_file)
+            
+            
+def listJsonRepoFiles(path="./"):
+    jsonFiles = []
+    for f in os.scandir(path):
+        if re.search(r'.json$',f.name):
+            jsonFiles.append(f.name)
+            
+    return(jsonFiles)
+
+
+        
+    
+            
         
             
         

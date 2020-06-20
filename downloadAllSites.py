@@ -12,6 +12,12 @@ from requests.exceptions import HTTPError
 from requests.exceptions import Timeout
 import re
 import json
+import string
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+stopwords = stopwords('english')
+
 
 """
 input fn 
@@ -93,7 +99,10 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
         with open(jsonFn, 'w') as json_file:
             json.dump(responseData,json_file)
             
-            
+"""
+input path - directory name
+output jsonFiles - list of files that end in ".json" in the directory
+"""            
 def listJsonRepoFiles(path="./"):
     jsonFiles = []
     for f in os.scandir(path):
@@ -101,6 +110,37 @@ def listJsonRepoFiles(path="./"):
             jsonFiles.append(f.name)
             
     return(jsonFiles)
+
+"""
+input str1, str2 two strings, clean Boolean to decide to remove stop words and punctuation
+output cosine of feature vectors
+"""
+def computeSimilarity(str1,str2,clean=False):
+    if clean_string:
+        s1 = clean_string(str1)
+        s2 = clean_string(str2)
+    else:
+        s1 = str1 
+        s2 = str2
+    
+    strings = [s1,s2]
+    
+    vectorizer = CountVectorizer().fit_transform(strings)
+    vectors = vectorizer.toarray()
+    return(cosine_similarity(vectors)[0][1])
+
+"""
+input s string
+output string with stop words and punctuation removed from s
+"""
+def clean_string(s):
+    text = "".join([word for word in s if word not in string.punctuation])
+    text = "".text.lower()
+    text = " ".join([word for word in text.split() if word not in stopwords ])
+    return(text)
+
+
+
 
 
         

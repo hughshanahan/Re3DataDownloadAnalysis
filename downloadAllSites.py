@@ -13,11 +13,14 @@ from requests.exceptions import Timeout
 import re
 import json
 import string
+import time
 from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
-from nltk.corpus import stopwords
-stopwords = stopwords('english')
+#import nltk
+#nltk.download('stopwords')
+#from nltk.corpus import stopwords
+#stopwords = stopwords.word('english')
 
 
 """
@@ -77,7 +80,7 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
         responseData['ID'] = r
 # Set up session so that request looks as if it is from a standard browser
         http = requests.Session()
-        http.headers.update({"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0"
+        http.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 })
         try:
 # Try and perform get, if there is an error or timeout, record that information            
@@ -119,12 +122,12 @@ input str1, str2 two strings, clean Boolean to decide to remove stop words and p
 output cosine of feature vectors
 """
 def computeSimilarity(str1,str2,clean=False):
-    if clean_string:
-        s1 = clean_string(str1)
-        s2 = clean_string(str2)
-    else:
-        s1 = str1 
-        s2 = str2
+#    if clean_string:
+#        s1 = clean_string(str1)
+#        s2 = clean_string(str2)
+#    else:
+    s1 = str1 
+    s2 = str2
     
     strings = [s1,s2]
     
@@ -136,22 +139,32 @@ def computeSimilarity(str1,str2,clean=False):
 input s string
 output string with stop words and punctuation removed from s
 """
-def clean_string(s):
-    text = "".join([word for word in s if word not in string.punctuation])
-    text = "".text.lower()
-    text = " ".join([word for word in text.split() if word not in stopwords ])
-    return(text)
+#def clean_string(s):
+#    text = "".join([word for word in s if word not in string.punctuation])
+#    text = "".text.lower()
+#    text = " ".join([word for word in text.split() if word not in stopwords ])
+#    return(text)
 
+"""
+input newDir string
+check if newDir already exists as a dir, if it doens't create it
+"""
+def makeDir(newDir):
+# Check if newDir exists otherwise create it
+    p = Path(newDir)
+    if not p.exists():
+        os.mkdir(newDir
+    
 """
 input oldDir - directory with repo json files
       newDir - directoty where repos that timed out will be rerun and stored
-      
+output number of repos that timed out      
 """
 def reRunTimeOutRepos(oldDir,newDir):
     # Check if newDir exists otherwise create it
-    p = Path(newDir)
-    if not p.exists():
-        os.mkdir(newDir)
+    makeDir(newDir)
+
+    nTimedOut = 0
         
     # Find all json files in oldDir
     allRepos = listJsonRepoFiles(oldDir)
@@ -163,20 +176,82 @@ def reRunTimeOutRepos(oldDir,newDir):
         if 'Timeout' in repo:
             (r,url) = (repo['ID'],repo['url'])
             timedOutReposList.append((r,url))
+            nTimedOut += 1
     
     # Now rerun download attempt with timed out repos
-    getWebPage(timedOutReposList,newDir)
+    if nTimedOut > 0:
+        getWebPage(timedOutReposList,newDir)
+
+    return(nTimedOut)            
+
+
     
+"""
+input : repo1, repo2 - two dicts carrying summary information on repos
+output : cosine similarity between texts
+
+The two repos should be downloaded from the same repository and will produce 
+an error if their id's do not match
+
+"""        
+def compareRepoTexts(repo1,repo2):
+    # Check if they have the same ID, otherwise fail
+    if repo1['ID'] != repo2['ID']:
+        raise RuntimeError('Repository dictionaries compared do not have the same ID')
+        
+    if not ( 'text' in repo1 and 'text' in repo2 ):
+        raise RuntimeError('Repository dictionary does not have text in it')
+    else:
+        return(computeSimilarity(repo1['text'],repo2['text']))
+
+"""
+input: repoFn - filename with json file of repo ID tuples
+       rootDir - root directory for saving data
+ouput: none
+
+repoFn is read and the list of repos downloaded in the root directory in folder 0
+an hour later the repos that are timed out are rerun in folder 1 and so on until we
+get to folder maxIter-1.
+"""
     
+def fullRun(repoFn,rootDir,maxIter=20):
+    repos = readReposList(repoFn)
+    iter = 0
+    allDone = False
     
-    getWebPage(timedOutReposList,newDir) 
+    print("Analysing for ",rootDir)
+    makeDir(rootDir)
+
+    print("Starting initial run")
+    oldDir = os.path.join(rootDir,str(iter))
+    makeDir(oldDir)
+    
+    getWebPage(repos, jsonFnRoot = oldDir)
+
+    
+    while  not allDone and iter < maxIter:
+        iter += 1
+        print("Initial run done - pausing for one hour")
+        time.sleep(3600)
+        newDir = os.path.join(rootDir,str(iter))
+        print("Rerunning on iteration" + str(iter) + "for timed out cases.")
+        print("Storing to" + newDir)
+        
+        nTimedOut = reRunTimeOutRepos(oldDir,newDir)
+        print(str(nTimedOut) + " repos timed out on " + oldDir)
+        allDone = nTimedOut == 0
+        
+        
         
             
+    
+    
             
         
     
     
     
+
 
 
 

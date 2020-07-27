@@ -223,12 +223,12 @@ input: repoFn - filename with json file of repo ID tuples
 ouput: none
 
 repoFn is read and the list of repos downloaded in the root directory in folder 0
-an hour later the repos that are timed out are rerun in folder 1 and so on until we
+pauseLength seconds later the repos that are timed out are rerun in folder 1 and so on until we
 get to folder maxIter-1.
 """
 
     
-def fullRun(repoFn,rootDir,maxIter=20):
+def fullRun(repoFn,rootDir,maxIter=20,pauseLength=3600):
     repos = readReposList(repoFn)
     iter = 0
     allDone = False
@@ -245,7 +245,7 @@ def fullRun(repoFn,rootDir,maxIter=20):
     while  not allDone and iter < maxIter:
         iter += 1
         print("Initial run done - pausing for one hour")
-        time.sleep(3600)
+        time.sleep(pauseLength)
         newDir = os.path.join(rootDir,str(iter))
         print("Rerunning on iteration" + str(iter) + "for timed out cases.")
         print("Storing to" + newDir)

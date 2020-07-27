@@ -51,6 +51,19 @@ def collateRepoURLs(repoFn='../repos/repos.txt'):
                             url = (x[1]).split(r'</r3d:repositoryURL>')[0]
             repos.append((r,url))
     return(repos)
+ 
+"""
+input URLfn - filename of file with URLs
+output tuples of form (id,url)
+"""   
+
+def collateURLs(URLfn):
+    repos = []
+    i = 0
+    with open(URLfn) as f:
+        for url in f:
+         repos.append((str(i),url))
+    return(repos)
     
 """
 input filename
@@ -213,6 +226,7 @@ repoFn is read and the list of repos downloaded in the root directory in folder 
 an hour later the repos that are timed out are rerun in folder 1 and so on until we
 get to folder maxIter-1.
 """
+<<<<<<< HEAD
     
 def fullRun(repoFn,rootDir,maxIter=20):
     repos = readReposList(repoFn)
@@ -226,6 +240,21 @@ def fullRun(repoFn,rootDir,maxIter=20):
     oldDir = os.path.join(rootDir,str(iter))
     makeDir(oldDir)
     
+=======
+    
+def fullRun(repoFn,rootDir,maxIter=20):
+    repos = readReposList(repoFn)
+    iter = 0
+    allDone = False
+    
+    print("Analysing for ",rootDir)
+    makeDir(rootDir)
+
+    print("Starting initial run")
+    oldDir = os.path.join(rootDir,str(iter))
+    makeDir(oldDir)
+    
+>>>>>>> efbd26e2049e546f7e67df62e04bf2b2d98bd8dd
     getWebPage(repos, jsonFnRoot = oldDir)
 
     

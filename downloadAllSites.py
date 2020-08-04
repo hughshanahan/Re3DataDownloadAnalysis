@@ -12,7 +12,7 @@ from requests.exceptions import HTTPError
 from requests.exceptions import Timeout
 import re
 import json
-import string
+#import string
 import time
 from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
@@ -22,6 +22,90 @@ from sklearn.feature_extraction.text import CountVectorizer
 #from nltk.corpus import stopwords
 #stopwords = stopwords.word('english')
 
+
+myConfig = {}
+homeIP = "http://127.0.0.1"
+cmdIP = homeIP+":22999"
+
+countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','kp','ie','za','gb']
+
+"""
+    input : filename
+    output : dictionary of private data
+"""
+def getConfigData(filename='myConfig.json'):
+    with open(filename, 'r') as openfile:
+        json_object = json.load(openfile)
+    return(json_object)
+
+"""
+   input: country - must be two letter code in countriesList
+   output: port created (assumes all is well in creation)
+   returns -1 if country not in countriesList
+   sets up a new port with a proxy to th country
+"""
+
+def openPort(country):
+    if country in countriesList:
+        nPort = findNewPort()
+        data = {'proxy':{'port':nPort,'zone': myConfig.zone,'proxy_type':'persist','customer':myConfig.customer,'password':myConfig.password, 'whitelist_ips':[]}}
+        requests.post(cmdIP+'/api/proxies', data=json.dumps(data), header = {"content-type": "application/json"})
+        return(nPort)
+    else:
+        print("setupPort:- "+country+" is not in the list of known two letter codes for countries")
+        return(-1)
+ 
+"""
+   find a new free port above 24000
+"""    
+def findNewPort():
+    r = requests.get(cmdIP+'/api/proxies')
+    n = len(r.json())
+    p = 0
+    if ( n > 2 ):
+        p = n - 1
+    else:
+        p = 0
+        
+    lastPort = r.json()[p]['port']
+    return(lastPort + 1)
+        
+"""
+   input port number nPort
+   deletes a port entry
+"""    
+def closePort(nPort):
+    myURL = cmdIP+'/api/proxies/'+str(nPort)
+    requests.delete(myURL)
+    
+"""
+   input port number
+   output country for proxy for that port, if port exists
+   otherwise returns error message
+"""    
+def countryForPort(nPort):
+    r = requests.get(cmdIP+'/api/proxies')
+    n = len(r.json())
+    l = []
+    for i in range(n):
+        if  i != 1 :
+            l.append(i)
+    found = False
+    i = 0
+    country = ""
+    while not found and i < len(l):
+        p = l[0]
+        thisPort = r.json()[p]['port']
+        if thisPort == nPort:
+            found = True
+            country = r.json()[p]['country']
+        else:
+            i += 1
+            
+    if i == len(l):
+        print("countryForPort: cannot locate port "+str(nPort))
+    
+    return(country)
 
 """
 input fn 
@@ -85,7 +169,11 @@ def writeReposList(repos,filename="../repos/repos.json"):
 input repos - list of repos (tuples (r3dID, url))
 downloads web pages corresponding to the list of repos.
 """        
-def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
+def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30,port=24000):
+    
+    PROXY = homeIP+str(port)
+    proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
+    
     for (r,url) in repos:
         print(r + " " + url)
         responseData = {}
@@ -97,7 +185,7 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30):
 })
         try:
 # Try and perform get, if there is an error or timeout, record that information            
-            response = http.get(url,timeout=TIMEOUT)
+            response = http.get(url,timeout=TIMEOUT,proxies=proxyDict)
             response.raise_for_status()
         except Timeout:
             print("Timeout")

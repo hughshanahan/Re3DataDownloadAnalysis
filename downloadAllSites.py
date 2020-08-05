@@ -108,6 +108,18 @@ def countryForPort(nPort):
     return(country)
 
 """
+    output: return json of proxy data
+
+"""
+def proxyData(port):
+    
+    PROXY = homeIP+str(port)
+    proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
+    response = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
+    return(response.json())
+        
+
+"""
 input fn 
 creates a file (filename fn) with a list of repo ids from r3data
 """

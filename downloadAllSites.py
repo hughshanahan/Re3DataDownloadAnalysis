@@ -48,8 +48,8 @@ def getConfigData(filename='myConfig.json'):
 def openPort(country):
     if country in countriesList:
         nPort = findNewPort()
-        data = {'proxy':{'port':nPort,'zone': myConfig.zone,'proxy_type':'persist','customer':myConfig.customer,'password':myConfig.password, 'whitelist_ips':[]}}
-        requests.post(cmdIP+'/api/proxies', data=json.dumps(data), header = {"content-type": "application/json"})
+        data = {'proxy':{'port':nPort,'zone': myConfig['zone'],'proxy_type':'persist','customer':myConfig['customer'],'password':myConfig['password'], country:country,'whitelist_ips':[]}}
+        requests.post(cmdIP+'/api/proxies', data=json.dumps(data), headers = {"content-type": "application/json"})
         return(nPort)
     else:
         print("setupPort:- "+country+" is not in the list of known two letter codes for countries")
@@ -94,7 +94,7 @@ def countryForPort(nPort):
     i = 0
     country = ""
     while not found and i < len(l):
-        p = l[0]
+        p = l[i]
         thisPort = r.json()[p]['port']
         if thisPort == nPort:
             found = True

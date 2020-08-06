@@ -48,7 +48,7 @@ def getConfigData(filename='myConfig.json'):
 def openPort(country):
     if country in countriesList:
         nPort = findNewPort()
-        data = {'proxy':{'port':nPort,'zone': myConfig['zone'],'proxy_type':'persist','customer':myConfig['customer'],'password':myConfig['password'], country:country,'whitelist_ips':[]}}
+        data = {'proxy':{'port':nPort,'zone': myConfig['zone'],'proxy_type':'persist','customer':myConfig['customer'],'password':myConfig['password'], 'country':country,'whitelist_ips':[]}}
         requests.post(cmdIP+'/api/proxies', data=json.dumps(data), headers = {"content-type": "application/json"})
         return(nPort)
     else:

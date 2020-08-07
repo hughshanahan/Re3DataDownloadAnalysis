@@ -18,7 +18,7 @@ re3 = das.readReposList("./repos.json")
 additional = das.readReposList("./additionalSites.json")
 
 path = "../data"
-
+ 
 for country in das.countriesList:
     nPort = das.openPort(country)
 

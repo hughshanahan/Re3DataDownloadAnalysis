@@ -113,7 +113,7 @@ def countryForPort(nPort):
 """
 def proxyData(port):
     
-    PROXY = homeIP+str(port)
+    PROXY = homeIP+":"+str(port)
     proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
     response = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
     return(response.json())
@@ -159,6 +159,7 @@ def collateURLs(URLfn):
     with open(URLfn) as f:
         for url in f:
          repos.append((str(i),url))
+         i += 1
     return(repos)
     
 """
@@ -183,7 +184,7 @@ downloads web pages corresponding to the list of repos.
 """        
 def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30,port=24000):
     
-    PROXY = homeIP+str(port)
+    PROXY = homeIP+":"+str(port)
     proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
     
     for (r,url) in repos:

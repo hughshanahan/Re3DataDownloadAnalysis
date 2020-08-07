@@ -10,7 +10,7 @@ import downloadAllSites as das
 
 das.myConfig = das.getConfigData()
 
-country = 'gb'
+country = 'jp'
 nPort = das.openPort(country)
 
 print("Country = "+das.countryForPort(nPort))
@@ -21,6 +21,8 @@ print(pData)
 
 das.closePort(nPort)
 
+for country in das.countriesList:
+    
 
 
 

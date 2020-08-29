@@ -146,38 +146,7 @@ def proxyData(port):
     
     PROXY = homeIP+":"+str(port)
     proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
-    responseimport downloadAllSites as das
-import json
-import os
-
-das.myConfig = das.getConfigData()
-
-country = 'jp'
-
-re3 = das.readReposList("./repos.json")
-additional = das.readReposList("./additionalSites.json")
-
-path = "../data"
- 
-for country in das.countriesList:
-#    nPort = das.openPort(country)
-
-#    print("Country = "+das.countryForPort(nPort))
-
-#    pData = das.proxyData(nPort)
-
-    dataPath = os.path.join(path,country)
-    print("dataPath = "+dataPath)
-    das.makeDir(dataPath)
-    
-#    portDataFn = os.path.join(dataPath,"portData.json") 
-#    with open(portDataFn,"w") as pDataOutFile:
-#        pDataOutFile.write(json.dumps(pData))
-        
-#    das.getWebPage(re3,dataPath)
-#    das.getWebPage(additional,dataPath)    
-
-#    das.closePort(nPort) = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
+    response = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
     return(response.json())
         
 

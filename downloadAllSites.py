@@ -9,7 +9,38 @@ Created on Wed Jun  3 16:18:51 2020
 import os
 import requests
 from requests.exceptions import HTTPError
-from requests.exceptions import Timeout
+from requests.exceptions imimport downloadAllSites as das
+import json
+import os
+
+das.myConfig = das.getConfigData()
+
+country = 'jp'
+
+re3 = das.readReposList("./repos.json")
+additional = das.readReposList("./additionalSites.json")
+
+path = "../data"
+ 
+for country in das.countriesList:
+#    nPort = das.openPort(country)
+
+#    print("Country = "+das.countryForPort(nPort))
+
+#    pData = das.proxyData(nPort)
+
+    dataPath = os.path.join(path,country)
+    print("dataPath = "+dataPath)
+    das.makeDir(dataPath)
+    
+#    portDataFn = os.path.join(dataPath,"portData.json") 
+#    with open(portDataFn,"w") as pDataOutFile:
+#        pDataOutFile.write(json.dumps(pData))
+        
+#    das.getWebPage(re3,dataPath)
+#    das.getWebPage(additional,dataPath)    
+
+#    das.closePort(nPort)port Timeout
 import re
 import json
 #import string
@@ -115,7 +146,38 @@ def proxyData(port):
     
     PROXY = homeIP+":"+str(port)
     proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
-    response = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
+    responseimport downloadAllSites as das
+import json
+import os
+
+das.myConfig = das.getConfigData()
+
+country = 'jp'
+
+re3 = das.readReposList("./repos.json")
+additional = das.readReposList("./additionalSites.json")
+
+path = "../data"
+ 
+for country in das.countriesList:
+#    nPort = das.openPort(country)
+
+#    print("Country = "+das.countryForPort(nPort))
+
+#    pData = das.proxyData(nPort)
+
+    dataPath = os.path.join(path,country)
+    print("dataPath = "+dataPath)
+    das.makeDir(dataPath)
+    
+#    portDataFn = os.path.join(dataPath,"portData.json") 
+#    with open(portDataFn,"w") as pDataOutFile:
+#        pDataOutFile.write(json.dumps(pData))
+        
+#    das.getWebPage(re3,dataPath)
+#    das.getWebPage(additional,dataPath)    
+
+#    das.closePort(nPort) = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
     return(response.json())
         
 
@@ -214,7 +276,7 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30,port=24000):
             responseData['text'] = response.text
             responseData['status_code'] = response.status_code
         
-        jsonFn = jsonFnRoot + r + ".json"
+        jsonFn = os.path.join(jsonFnRoot, r + ".json")
 
         with open(jsonFn, 'w') as json_file:
             json.dump(responseData,json_file)

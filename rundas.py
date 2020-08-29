@@ -27,6 +27,7 @@ for country in das.countriesList:
     pData = das.proxyData(nPort)
 
     dataPath = os.path.join(path,country)
+    print("dataPath = "+dataPath)
     das.makeDir(dataPath)
     
     portDataFn = os.path.join(dataPath,"portData.json") 

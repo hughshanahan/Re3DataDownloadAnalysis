@@ -33,9 +33,10 @@ for country in das.countriesList:
     portDataFn = os.path.join(dataPath,"portData.json") 
     with open(portDataFn,"w") as pDataOutFile:
         pDataOutFile.write(json.dumps(pData))
-        
+    
+    das.getWebPage(additional,dataPath)
     das.getWebPage(re3,dataPath)
-    das.getWebPage(additional,dataPath)    
+        
 
     das.closePort(nPort)    
 

@@ -9,7 +9,7 @@ Created on Wed Jun  3 16:18:51 2020
 import os
 import requests
 from requests.exceptions import HTTPError
-from requests.exceptions imimport downloadAllSites as das
+from requests.exceptions import downloadAllSites as das
 import json
 import os
 

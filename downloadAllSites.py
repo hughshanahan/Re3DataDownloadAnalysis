@@ -27,7 +27,8 @@ myConfig = {}
 homeIP = "http://127.0.0.1"
 cmdIP = homeIP+":22999"
 
-countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','kp','ie','za','gb']
+countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
+#kp = North Korea?
 
 """
     input : filename
@@ -156,10 +157,12 @@ output tuples of form (id,url)
 def collateURLs(URLfn):
     repos = []
     i = 0
-    with open(URLfn) as f:
-        for url in f:
-         repos.append((str(i),url))
-         i += 1
+    f = open(URLfn,'r')
+    x = f.read()
+    r = x.split("\n")    
+    for url in r:
+        repos.append((str(i),url))
+        i += 1
     return(repos)
     
 """

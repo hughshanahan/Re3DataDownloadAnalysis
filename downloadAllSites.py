@@ -248,12 +248,15 @@ def computeSimilarity(str1,str2,clean=False):
 #    else:
     s1 = str1 
     s2 = str2
+
+    if len(s1) > 0 and len(s2) > 0: 
+        strings = [s1,s2]
     
-    strings = [s1,s2]
-    
-    vectorizer = CountVectorizer().fit_transform(strings)
-    vectors = vectorizer.toarray()
-    return(cosine_similarity(vectors)[0][1])
+        vectorizer = CountVectorizer().fit_transform(strings)
+        vectors = vectorizer.toarray()
+        return(cosine_similarity(vectors)[0][1])
+    else:
+        return(0.0)
 
 """
 input s string

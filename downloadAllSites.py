@@ -27,7 +27,10 @@ myConfig = {}
 homeIP = "http://127.0.0.1"
 cmdIP = homeIP+":22999"
 
-countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
+#countriesList = ['ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
+
+#countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
+countriesList = ['kp']
 #kp = North Korea?
 
 """
@@ -316,8 +319,10 @@ def compareRepoTexts(repo1,repo2):
     if repo1['ID'] != repo2['ID']:
         raise RuntimeError('Repository dictionaries compared do not have the same ID')
         
-    if not ( 'text' in repo1 and 'text' in repo2 ):
-        raise RuntimeError('Repository dictionary does not have text in it')
+    if not ( 'text' in repo1 ) and not ( 'text' in repo2 ):
+        return(-1)
+    elif not ( 'text' in repo1 ) or not ( 'text' in repo2 ):     
+        return(0)
     else:
         return(computeSimilarity(repo1['text'],repo2['text']))
 

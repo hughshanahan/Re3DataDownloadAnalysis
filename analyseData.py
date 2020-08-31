@@ -84,11 +84,33 @@ def computeAllSimilarities(root,countries,sites):
                         similarities[url][ci][cj] = s
     return(similarities)
 
+def computePairSimilarities(root,ci,cj,sites):
+   # df = setUpDataFrame(countries,sites)
+    similarities = multi_dict(3,float)
+    nc = len(countries)
+    print("First country = "+ci)
+    print("Second country = "+cj)
+    for (fn,url) in sites:
+        fi = os.path.join(root,ci,fn)
+        fj = os.path.join(root,cj,fn)
+        fpi = open(fi)
+        ri = json.load(fpi)
+        fpi.close()
+        fpj = open(fj)
+        rj = json.load(fpj)
+        fpj.close()
+        s = das.compareRepoTexts(ri,rj)
+#        print(ci,cj,url,s)
+        if s < 0.9:
+            similarities[url][ci][cj] = s
+    return(similarities)
+
     
 countries = getCountries("../data")
 sites = getSites("../data/us")
 
 sims = computeAllSimilarities("../data",countries,sites)
+#sims = computePairSimilarities("../data",'kp','gb',sites)
 with open("./similarities.json","w") as sdump:
     json.dump(sims,sdump)
     

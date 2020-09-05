@@ -2,3 +2,5 @@
 myConfig.json
 __pycache__
 nohup.out
+#analyseData.py#
+analyseData.py~

@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+import csv
 #import nltk
 #nltk.download('stopwords')
 #from nltk.corpus import stopwords
@@ -329,6 +330,41 @@ def compareRepoTexts(repo1,repo2):
     else:
         return(computeSimilarity(repo1['text'],repo2['text']))
 
+"""
+  input: dir - directory to read data; storeSummery (default TRUE) - return csv file of summary data; summaryFileName (default "summary.csv") - csv file of summary data
+  output: list of filenames that generated an error 
+"""
+
+def getSummaryRepoData(dir,storeSummary=True,summaryFileName="summary.csv"):
+
+    headings = ["filename","url","Timeout","HTTPError","otherErr","status_code"]
+    listRepos = listJsonRepoFiles(dir)
+    summaryData = []
+        
+    for filename in listRepos:
+# Don't include port information json file        
+        if filename != "portData.json":
+            with open(os.path.join(dir,filename)) as f:
+                rd = json.load(f)
+# Add empty field to repo dict for any key not there                
+                for key in headings[1:]:
+                    if not key in rd:
+                        rd[key] = ""
+                rd["filename"] = filename
+                summaryData.append(rd)
+
+    if storeSummary:
+        with open(summaryFileName,'w') as fout:
+            csvf = csv.writer(fout)
+            csvf.writerow(headings)
+            for r in summaryData:
+                l = []
+                for k in headings:
+                    l.append(r[k])
+                csvf.writerow(l)
+        
+    return(summaryData)
+    
 """
 input: repoFn - filename with json file of repo ID tuples
        rootDir - root directory for saving data

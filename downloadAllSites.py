@@ -364,7 +364,21 @@ def getSummaryRepoData(dir,storeSummary=True,summaryFileName="summary.csv"):
                 csvf.writerow(l)
         
     return(summaryData)
-    
+
+
+"""
+   input: summaryData list of tuples carrying data about downlaod repo data
+   output: list of tuples of form (id, url) - only carrying those urls that had
+           problems (time out etc.)
+"""
+def filterSummaryData(summary):
+    fl = []
+    for r in summary:
+        if r["Timeout"] != "" or r["HTTPError"] != "" or r["otherErr"} != "" or r["status_code"] != "200":
+            id = r["filename"].replace('.json','')
+            fl.append(id,r['url'])
+    return(fl)
+
 """
 input: repoFn - filename with json file of repo ID tuples
        rootDir - root directory for saving data

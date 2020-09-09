@@ -13,13 +13,6 @@ import iso3166
 import sys
 import getopt
 
-countries = []
-for c in iso3166.countries_by_alpha2.keys():
-    countries.append(c.lower())
-
-re3 = das.readReposList("./repos.json")
-additional = das.readReposList("./additionalSites.json")
-path = "../data"
     
 """
    input country - two letter code ISO 3160 standard
@@ -43,7 +36,7 @@ def rerun(country,path,i):
 
     newCountryPath = os.path.join(path,country,"Rerun"+str(i))
 
-    summaryData = das.getSummaryData(countryPath,os.path.join(countryPath,"summary.csv")
+    summaryData = das.getSummaryRepoData(countryPath,True,os.path.join(countryPath,"summary.csv"))
 
     failedRepos = das.filterSummaryData(summaryData)
                                      
@@ -63,18 +56,24 @@ def rerun(country,path,i):
     das.closePort(nPort)    
 
     return()
-                                     
 
 def main(argv):
+
+    countries = []
+    for c in iso3166.countries_by_alpha2.keys():
+        countries.append(c.lower())
+
+    path = "../data"
+    
     try:
-        opts, args = getopt.getopt(argv,"hc::",["country="])
+        opts, args = getopt.getopt(argv,"hc:")
     except getopt.GetoptError:
-        print('rundas.py -c country (two leter code)')
+        print('rundas.py -c country (two letter code)')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == "-h":
-            print('rundas.py -c country (two leter code)')
+            print('rundas.py -c country (two letter code)')
             sys.exit()
         elif opt == "-c":
 
@@ -84,9 +83,14 @@ def main(argv):
                 sys.exit(1)
 
             for i in range(1,11):
-                rerun(path,country,i)
+                rerun(country,path,i)
+        else:
+            print('rundas.py -c country (two letter code)')
+            sys.exit()
+                
 
-
+if __name__ == "__main__":
+    main(sys.argv[1:])
 
 
 

@@ -18,6 +18,7 @@ from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import csv
+import iso3166
 #import nltk
 #nltk.download('stopwords')
 #from nltk.corpus import stopwords
@@ -31,8 +32,12 @@ cmdIP = homeIP+":22999"
 #countriesList = ['ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
 
 #countriesList = ['jp','us','ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
-countriesList = ['kp']
+#countriesList = ['kp']
 #kp = North Korea?
+countriesList=[]
+for c in iso3166.countries_by_alpha2.keys():
+    countriesList.append(c.lower())
+
 
 """
     input : filename
@@ -57,7 +62,7 @@ def openPort(country):
         requests.post(cmdIP+'/api/proxies', data=json.dumps(data), headers = {"content-type": "application/json"})
         return(nPort)
     else:
-        print("setupPort:- "+country+" is not in the list of known two letter codes for countries")
+        print("openPort:- "+country+" is not in the list of known two letter codes for countries")
         return(-1)
  
 """
@@ -374,9 +379,9 @@ def getSummaryRepoData(dir,storeSummary=True,summaryFileName="summary.csv"):
 def filterSummaryData(summary):
     fl = []
     for r in summary:
-        if r["Timeout"] != "" or r["HTTPError"] != "" or r["otherErr"} != "" or r["status_code"] != "200":
+        if r["Timeout"] != "" or r["HTTPError"] != "" or r["otherErr"] != "" or r["status_code"] >= 400:
             id = r["filename"].replace('.json','')
-            fl.append(id,r['url'])
+            fl.append((id,r['url']))
     return(fl)
 
 """

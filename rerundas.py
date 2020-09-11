@@ -66,14 +66,17 @@ def main(argv):
     path = "../data"
     
     try:
-        opts, args = getopt.getopt(argv,"hc:")
+        opts, args = getopt.getopt(argv,"hc:r:")
     except getopt.GetoptError:
         print('rundas.py -c country (two letter code)')
         sys.exit(2)
 
+    country = ""
+    restartPoint = 1
+    
     for opt, arg in opts:
         if opt == "-h":
-            print('rundas.py -c country (two letter code)')
+            print('rundas.py -c country (two letter code) -r restart point')
             sys.exit()
         elif opt == "-c":
 
@@ -82,13 +85,20 @@ def main(argv):
                 print('rundas.py: '+country+' must be a valid two letter country code (ISO 3166 standard)')
                 sys.exit(1)
 
-            for i in range(1,11):
-                rerun(country,path,i)
+        elif opt == "-r":
+            restartPoint = int(arg)
+            if restartPoint > 11:
+                print('rundas.py: '+restartPoint+' must be less than or equal to 11')
+                sys.exit(1)
+                
         else:
-            print('rundas.py -c country (two letter code)')
-            sys.exit()
+            print('rundas.py -c country (two letter code) -r restart point')
+            sys.exit(0)
                 
 
+    for i in range(restartPoint,11):
+        rerun(country,path,i)
+        
 if __name__ == "__main__":
     main(sys.argv[1:])
 

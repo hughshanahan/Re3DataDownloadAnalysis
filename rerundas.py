@@ -45,7 +45,7 @@ def rerun(country,path,i):
     print("Country = "+das.countryForPort(nPort))
 
     pData = das.proxyData(nPort)
-    das.makeDir(newCountryPath)
+    das.makeDir(newCountryPath,removeOldEntries=True)
                                                                             
     portDataFn = os.path.join(newCountryPath,"portData.json") 
     with open(portDataFn,"w") as pDataOutFile:

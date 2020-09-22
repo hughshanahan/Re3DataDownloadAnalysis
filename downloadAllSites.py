@@ -276,12 +276,18 @@ output string with stop words and punctuation removed from s
 
 """
 input newDir string
-check if newDir already exists as a dir, if it doens't create it
+      removeOldEntries (optional - default False)
+check if newDir already exists as a dir, if it doesn't create it. If removeOldEntries is True then remove all old files in that directory 
 """
-def makeDir(newDir):
+def makeDir(newDir,removeOldEntries=False):
 # Check if newDir exists otherwise create it
     p = Path(newDir)
-    if not p.exists():
+    if p.exists():
+        if removeOldEntries:
+            for f in os.listdir(newDir):
+                fp = os.path.join(newDir,f)
+                os.remove(fp)
+    else:
         os.mkdir(newDir)
     
 """

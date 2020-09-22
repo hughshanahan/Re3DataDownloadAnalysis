@@ -8,6 +8,7 @@ Created on Wed Aug  5 09:38:07 2020
 
 import downloadAllSites as das
 import json
+from pathlib import Path
 import os
 import iso3166
 import sys
@@ -46,6 +47,26 @@ def runCountry(country,path):
     das.closePort(nPort)    
 
     return()
+
+"""
+   input filename (default analysedCountries.json)
+   output list with countries stored in filename. If filename doesn't exist,
+   return an empty list
+"""
+def findAnalysedCountries(filename="analysedCountries.json"):
+
+    if Path(filename).exists():
+        with open(filename, 'r') as openfile:
+            json_object = json.load(openfile)
+        return(json_object)
+    else:
+        return(())
+
+"""
+   input: country - country just analysed
+          
+
+"""
 
 def main():
 

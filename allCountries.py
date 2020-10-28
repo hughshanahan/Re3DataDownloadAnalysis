@@ -60,13 +60,16 @@ def findAnalysedCountries(filename="analysedCountries.json"):
             json_object = json.load(openfile)
         return(json_object)
     else:
-        return(())
+        return([])
 
 """
-   input: country - country just analysed
-          
-
+   input: doneCountries, filename
+   output: save doneCountries to filename
 """
+def updateDoneCountries(doneCountries, filename = "analysedCountries.json"):
+    with open(filename,'w') as wfile:
+        json.dump(doneCountries,wfile)
+    
 
 def main():
 
@@ -83,7 +86,8 @@ def main():
             print("Starting run on " + c)
             runCountry(country,path)
             print("Finished run on " + c)
-            updateDoneCountries(c,doneCountries)
+            doneCountries.append(c)
+            updateDoneCountries(doneCountries)
         
 if __name__ == "__main__":
     main()

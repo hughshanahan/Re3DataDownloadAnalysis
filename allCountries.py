@@ -11,9 +11,11 @@ import json
 from pathlib import Path
 import os
 import iso3166
-import sys
+import sys                      # 
 import getopt
 
+re3 = das.readReposList("./repos.json")
+additional = das.readReposList("./additionalSites.json")
     
 """
    input country - two letter code ISO 3160 standard
@@ -29,8 +31,6 @@ def runCountry(country,path):
 
     countryPath = os.path.join(path,country)
 
-    newCountryPath = os.path.join(path,country,"Rerun"+str(i))
-
     nPort = das.openPort(country)
 
     print("Country = "+das.countryForPort(nPort))
@@ -41,8 +41,10 @@ def runCountry(country,path):
     portDataFn = os.path.join(countryPath,"portData.json") 
     with open(portDataFn,"w") as pDataOutFile:
         pDataOutFile.write(json.dumps(pData))
-    
-    das.getWebPage(failedRepos,countryPath)
+
+        
+    das.getWebPage(additional,countryPath)
+    das.getWebPage(re3,countryPath)    
 
     das.closePort(nPort)    
 
@@ -84,7 +86,7 @@ def main():
     for c in countries:
         if not c in doneCountries:
             print("Starting run on " + c)
-            runCountry(country,path)
+            runCountry(c,path)
             print("Finished run on " + c)
             doneCountries.append(c)
             updateDoneCountries(doneCountries)

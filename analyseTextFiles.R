@@ -76,6 +76,45 @@ runAllFolders <- function(myFolder){
       }  
     }
   }
-  
 }
 
+numErrors <- function(data){
+  c1 <- length(which(data$data < -0.9 & data$data > -1.1))
+  c2 <- length(which(data$data < -9 & data$data > -11))
+  v <- c(c1,c2)
+  v
+}
+
+numDifferent <- function(data){
+  length(which(data$data > 0.2))
+}
+
+getSummary <- function(c1,c2){
+  load(paste("geoblock_",c1,"_",c2,".Rdata",sep=""))
+  c(numDifferent(thisData),numErrors(thisData))
+}
+
+plotExcess <- function(){
+ require(ggplot2)
+ B <- c("cu","ir","iq","kp","sd","sy","ve","ye","mm")
+ Bl <- c("Cuba","Iran","Iraq","NorthKorea","Sudan","Syria","Venezuela","Yemen","Myanmar")
+ NB <- c("ie","gb","jp","za")
+ NBl <- c("Ireland","UK","Japan","SouthAfrica") 
+ Cs <- c(B,NB)
+ Csl <- c(Bl,NBl)
+ l <- c(rep("Test",length(B)),rep("Control",length(NB)))
+ xs <- sapply(Cs,
+              function(c){
+                v <- getSummary(c,"us")
+                v[2] / v[3]
+                }
+              )
+ xs <- unname(unlist(xs))
+ print(xs)
+ df <- data.frame(Country=Csl,Excess=xs,Status=l)
+ print(df)
+ ggplot(data=df,aes(x=Country,y=Excess,fill=Status)) + 
+   geom_bar(stat="identity") + 
+   scale_x_discrete(limits=Csl) + 
+   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+}

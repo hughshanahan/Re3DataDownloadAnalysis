@@ -94,7 +94,7 @@ getSummary <- function(c1,c2){
   c(numDifferent(thisData),numErrors(thisData))
 }
 
-plotExcess <- function(){
+plotExcess <- function(fn=NULL){
  require(ggplot2)
  B <- c("cu","ir","iq","kp","sd","sy","ve","ye","mm")
  Bl <- c("Cuba","Iran","Iraq","NorthKorea","Sudan","Syria","Venezuela","Yemen","Myanmar")
@@ -113,8 +113,12 @@ plotExcess <- function(){
  print(xs)
  df <- data.frame(Country=Csl,Excess=xs,Status=l)
  print(df)
- ggplot(data=df,aes(x=Country,y=Excess,fill=Status)) + 
+ p<-ggplot(data=df,aes(x=Country,y=Excess,fill=Status)) + 
    geom_bar(stat="identity") + 
    scale_x_discrete(limits=Csl) + 
    theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+ p
+ if (!is.null(fn)){
+   ggsave(fn)
+ }
 }

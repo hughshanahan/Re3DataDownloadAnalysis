@@ -58,17 +58,6 @@ def openProxy(country):
     return(opener)
  
 """
-    output: return json of proxy data
-"""
-def proxyData(port):
-    
-    PROXY = homeIP+":"+str(port)
-    proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
-    response = requests.get('http://lumtest.com/myip.json',proxies=proxyDict)
-    return(response.json())
-        
-
-"""
 input fn 
 creates a file (filename fn) with a list of repo ids from r3data
 """
@@ -153,8 +142,8 @@ def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=30):
         try:
 # Try and perform get, if there is an error or timeout, record that information 
             with opener.open(req,timeout=TIMEOUT) as response:
-            responseData['status'] = response.code
-            responseData['headers'] = dict(response.headers)
+                responseData['status'] = response.code
+                responseData['headers'] = dict(response.headers)
         except urllib.error.HTTPError as e:
             responseData['status'] = e.code
             responseData['headers'] = dict(e.headers)    

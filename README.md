@@ -10,3 +10,10 @@ The update will include
 
 The focus here will be on nations in conflict, specifically those affected by the war in Ukraine.
 
+
+**Getting the latest version of Re3Data**
+
+import downAllSites as das
+das.downloadRepos(fn="./repos.xml') #Pulls out Re3Data Ids
+repos = das.collateRepoURLs("./repos.xml","./repos.json") #Save a json file of Re3Data Ids and their URLs
+ 

@@ -7,9 +7,9 @@ Created on Wed Jun  3 16:18:51 2020
 """
 
 import os
-import requests
-from requests.exceptions import HTTPError
-from requests.exceptions import Timeout
+import sys
+import ssl
+import urllib.request
 import re
 import json
 #import string

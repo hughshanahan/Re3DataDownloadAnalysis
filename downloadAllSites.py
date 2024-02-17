@@ -19,15 +19,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import csv
 import iso3166
-#import nltk
-#nltk.download('stopwords')
-#from nltk.corpus import stopwords
-#stopwords = stopwords.word('english')
 
 
-myConfig = {}
-homeIP = "http://127.0.0.1"
-cmdIP = homeIP+":22999"
 
 #countriesList = ['ir','cu','sd','ye','iq','ve','sy','mm','ie','za','gb']
 
@@ -50,76 +43,22 @@ def getConfigData(filename='myConfig.json'):
 
 """
    input: country - must be two letter code in countriesList
-   output: port created (assumes all is well in creation)
-   returns -1 if country not in countriesList
-   sets up a new port with a proxy to th country
+   output: urllib opener
+   opens a BrightData proxy for a specific country 
+  
 """
 
-def openPort(country):
-    if country in countriesList:
-        nPort = findNewPort()
-        data = {'proxy':{'port':nPort,'zone': myConfig['zone'],'proxy_type':'persist','customer':myConfig['customer'],'password':myConfig['password'], 'country':country,'whitelist_ips':[]}}
-        requests.post(cmdIP+'/api/proxies', data=json.dumps(data), headers = {"content-type": "application/json"})
-        return(nPort)
-    else:
-        print("openPort:- "+country+" is not in the list of known two letter codes for countries")
-        return(-1)
+def openProxy(country):
+    ssl._create_default_https_context = ssl._create_unverified_context
+    pstr = 'http://'+myConfig[username]+"-country-"+country+":"+myConfig[password]+"@"+myConfig[host]
+    try:
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({'http': pstr, 'https':pstr}))
+    except urllib.error.URLError as e:
+        print("downloadAllSite.openProxy : "+e.reason)
+    return(opener)
  
 """
-   find a new free port above 24000
-"""    
-def findNewPort():
-    r = requests.get(cmdIP+'/api/proxies')
-    n = len(r.json())
-    p = 0
-    if ( n > 2 ):
-        p = n - 1
-    else:
-        p = 0
-        
-    lastPort = r.json()[p]['port']
-    return(lastPort + 1)
-        
-"""
-   input port number nPort
-   deletes a port entry
-"""    
-def closePort(nPort):
-    myURL = cmdIP+'/api/proxies/'+str(nPort)
-    requests.delete(myURL)
-    
-"""
-   input port number
-   output country for proxy for that port, if port exists
-   otherwise returns error message
-"""    
-def countryForPort(nPort):
-    r = requests.get(cmdIP+'/api/proxies')
-    n = len(r.json())
-    l = []
-    for i in range(n):
-        if  i != 1 :
-            l.append(i)
-    found = False
-    i = 0
-    country = ""
-    while not found and i < len(l):
-        p = l[i]
-        thisPort = r.json()[p]['port']
-        if thisPort == nPort:
-            found = True
-            country = r.json()[p]['country']
-        else:
-            i += 1
-            
-    if i == len(l):
-        print("countryForPort: cannot locate port "+str(nPort))
-    
-    return(country)
-
-"""
     output: return json of proxy data
-
 """
 def proxyData(port):
     

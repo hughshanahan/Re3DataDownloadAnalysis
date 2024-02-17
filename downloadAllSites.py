@@ -139,10 +139,11 @@ def downloadRepos(fn='../repos/repos.txt'):
 
 
 """
-input repoFn
+input repoFn,jsonFn
 output list of tuples, each tuple is (repoId, repoURL)
+If jsonFn is not the default it also saves data as json
 """
-def collateRepoURLs(repoFn='../repos/repos.txt'):
+def collateRepoURLs(repoFn='../repos/repos.txt',jsonFn=""):
     repos = []
     with open(repoFn) as f:
         for line in f:
@@ -156,6 +157,11 @@ def collateRepoURLs(repoFn='../repos/repos.txt'):
                         if len(x) > 1:
                             url = (x[1]).split(r'</r3d:repositoryURL>')[0]
             repos.append((r,url))
+
+    if jsonFn != "":
+        with open(jsonFn,'w') as fo:
+            json.dump(repos,fo)
+
     return(repos)
  
 """

@@ -136,13 +136,10 @@ def writeReposList(repos,filename="../repos/repos.json"):
         json.dump(repos,json_file)
 
 """
-input repos - list of repos (tuples (r3dID, url))
-downloads web pages corresponding to the list of repos.
+input repos - list of repos (tuples (r3dID, url)), opener (proxy)
+attempts to download a set of web pages corresponding to the list of repos and returns status messages of that
 """        
-def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30,port=24000):
-    
-    PROXY = homeIP+":"+str(port)
-    proxyDict = { "http":PROXY,"https":PROXY,"ftp":PROXY}
+def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=30):
     
     for (r,url) in repos:
         print(r + " " + url)
@@ -150,26 +147,17 @@ def getWebPage(repos,jsonFnRoot="../r3d/",TIMEOUT=30,port=24000):
         responseData['url'] = url
         responseData['ID'] = r
 # Set up session so that request looks as if it is from a standard browser
-        http = requests.Session()
-        http.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
-})
+        hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+}
+        req = urllib.request.Request(url, headers=hdr)
         try:
-# Try and perform get, if there is an error or timeout, record that information            
-            response = http.get(url,timeout=TIMEOUT,proxies=proxyDict)
-            response.raise_for_status()
-        except Timeout:
-            print("Timeout")
-            responseData['Timeout'] = True    
-        except HTTPError as http_err:
-            responseData['HTTPError'] = str(http_err)
-        except Exception as err:
-            responseData['otherErr'] = str(err)
-
-            
-        else:
+# Try and perform get, if there is an error or timeout, record that information 
+            with opener.open(req,timeout=TIMEOUT) as response:
+            responseData['status'] = response.code
             responseData['headers'] = dict(response.headers)
-            responseData['text'] = response.text
-            responseData['status_code'] = response.status_code
+        except urllib.error.HTTPError as e:
+            responseData['status'] = e.code
+            responseData['headers'] = dict(e.headers)    
         
         jsonFn = os.path.join(jsonFnRoot, r + ".json")
 

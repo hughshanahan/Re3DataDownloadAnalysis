@@ -42,15 +42,15 @@ def getConfigData(filename='myConfig.json'):
     return(json_object)
 
 """
-   input: country - must be two letter code in countriesList
+   input: country - must be two letter code in countriesList, myConfig - ID data
    output: urllib opener
    opens a BrightData proxy for a specific country 
   
 """
 
-def openProxy(country):
+def openProxy(country,myConfig):
     ssl._create_default_https_context = ssl._create_unverified_context
-    pstr = 'http://'+myConfig[username]+"-country-"+country+":"+myConfig[password]+"@"+myConfig[host]
+    pstr = 'http://'+myConfig['username']+"-country-"+country+":"+myConfig['password']+"@"+myConfig['host']
     try:
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({'http': pstr, 'https':pstr}))
     except urllib.error.URLError as e:
@@ -131,27 +131,31 @@ attempts to download a set of web pages corresponding to the list of repos and r
 def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=30):
     
     for (r,url) in repos:
-        print(r + " " + url)
-        responseData = {}
-        responseData['url'] = url
-        responseData['ID'] = r
+        if url != "":
+            print(r + " " + url)
+            responseData = {}
+            responseData['url'] = url
+            responseData['ID'] = r
 # Set up session so that request looks as if it is from a standard browser
-        hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+            hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 }
-        req = urllib.request.Request(url, headers=hdr)
-        try:
+            req = urllib.request.Request(url, headers=hdr)
+            try:
 # Try and perform get, if there is an error or timeout, record that information 
-            with opener.open(req,timeout=TIMEOUT) as response:
-                responseData['status'] = response.code
-                responseData['headers'] = dict(response.headers)
-        except urllib.error.HTTPError as e:
-            responseData['status'] = e.code
-            responseData['headers'] = dict(e.headers)    
+                with opener.open(req,timeout=TIMEOUT) as response:
+                    responseData['status'] = response.code
+                    responseData['headers'] = dict(response.headers)
+            except urllib.error.HTTPError as e:
+                responseData['status'] = e.code
+                responseData['headers'] = dict(e.headers)   
+            except urllib.error.URLError as e:
+                responseData['reason'] = e.strerror 
+            except TimeoutError:
+                responseData['reason'] = "Timeout error"
         
-        jsonFn = os.path.join(jsonFnRoot, r + ".json")
-
-        with open(jsonFn, 'w') as json_file:
-            json.dump(responseData,json_file)
+            jsonFn = os.path.join(jsonFnRoot, r + ".json")
+            with open(jsonFn, 'w') as json_file:
+                json.dump(responseData,json_file)
             
 """
 input path - directory name

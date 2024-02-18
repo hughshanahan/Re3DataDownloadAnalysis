@@ -19,6 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import csv
 import iso3166
+import http.client
 
 
 
@@ -128,7 +129,7 @@ def writeReposList(repos,filename="../repos/repos.json"):
 input repos - list of repos (tuples (r3dID, url)), opener (proxy)
 attempts to download a set of web pages corresponding to the list of repos and returns status messages of that
 """        
-def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=30):
+def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=600):
     
     for (r,url) in repos:
         if url != "":
@@ -152,6 +153,9 @@ def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=30):
                 responseData['reason'] = e.strerror 
             except TimeoutError:
                 responseData['reason'] = "Timeout error"
+            except http.client.RemoteDisconnected:
+                responseData['reason'] = "Remote end closed connection"
+
         
             jsonFn = os.path.join(jsonFnRoot, r + ".json")
             with open(jsonFn, 'w') as json_file:

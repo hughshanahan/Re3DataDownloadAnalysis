@@ -128,12 +128,12 @@ def writeReposList(repos,filename="../repos/repos.json"):
 """
 input repos - list of repos (tuples (r3dID, url)), opener (proxy)
 attempts to download a set of web pages corresponding to the list of repos and returns status messages of that
+if the opener is None then the download doesn't use a proxy and loads from the IP address the runner is assigned to
 """        
 def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=600):
     
     for (r,url) in repos:
         if url != "":
-            print(r + " " + url)
             responseData = {}
             responseData['url'] = url
             responseData['ID'] = r
@@ -160,7 +160,45 @@ def getWebResponse(repos,opener,jsonFnRoot="../r3d/",TIMEOUT=600):
             jsonFn = os.path.join(jsonFnRoot, r + ".json")
             with open(jsonFn, 'w') as json_file:
                 json.dump(responseData,json_file)
-            
+
+"""
+input repos - list of repos (tuples (r3dID, url)), opener (proxy)
+attempts to download a set of web pages corresponding to the list of repos and returns status messages of that
+this download doesn't use a proxy and loads from the IP address the runner is assigned to
+"""        
+def getLocalWebResponse(repos,jsonFnRoot="../r3d/local",TIMEOUT=600):
+    
+    for (r,url) in repos:
+        if url != "":
+            print(r + " " + url)
+            responseData = {}
+            responseData['url'] = url
+            responseData['ID'] = r
+# Set up session so that request looks as if it is from a standard browser
+            hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+}
+            req = urllib.request.Request(url, headers=hdr)
+            try:
+# Try and perform get, if there is an error or timeout, record that information 
+                with urllib.request.urlopen(req,timeout=TIMEOUT) as response:
+                    responseData['status'] = response.code
+                    responseData['headers'] = dict(response.headers)
+            except urllib.error.HTTPError as e:
+                responseData['status'] = e.code
+                responseData['headers'] = dict(e.headers)   
+            except urllib.error.URLError as e:
+                responseData['reason'] = e.strerror 
+            except TimeoutError:
+                responseData['reason'] = "Timeout error"
+            except http.client.RemoteDisconnected:
+                responseData['reason'] = "Remote end closed connection"
+            except ConnectionResetError as e:
+                responseData['reason'] = e.strerror
+
+        
+            jsonFn = os.path.join(jsonFnRoot, r + ".json")
+            with open(jsonFn, 'w') as json_file:
+                json.dump(responseData,json_file)            
 """
 input path - directory name
 output jsonFiles - list of files that end in ".json" in the directory
